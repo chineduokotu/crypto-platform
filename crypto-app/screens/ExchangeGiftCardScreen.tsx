@@ -54,7 +54,8 @@ export default function ExchangeGiftCardScreen({ navigation }: any) {
   };
 
   const handleGiftcardChange = (giftcardId: string) => {
-    const card = giftcards.find((g) => g.id === parseInt(giftcardId));
+    // Compare as strings to handle both number and string IDs from API
+    const card = giftcards.find((g) => String(g.id) === String(giftcardId));
     if (card) {
       setSelectedGiftcard(card);
       setExchangeRate(card.exchange_rate);
@@ -131,14 +132,14 @@ export default function ExchangeGiftCardScreen({ navigation }: any) {
             <Text style={[styles.label, isDark && styles.labelDark]}>Gift Card Type</Text>
             <View style={[styles.pickerContainer, isDark && styles.pickerContainerDark]}>
               <Picker
-                selectedValue={selectedGiftcard?.id}
-                onValueChange={handleGiftcardChange}
+                selectedValue={selectedGiftcard?.id ? String(selectedGiftcard.id) : ""}
+                onValueChange={(val) => handleGiftcardChange(String(val))}
                 style={[styles.picker, isDark && styles.pickerDark]}
                 dropdownIconColor={isDark ? '#f9fafb' : '#111827'}
               >
-                <Picker.Item label="-- Select Gift Card --" value={null} color={isDark ? '#f9fafb' : '#111827'} />
+                <Picker.Item label="-- Select Gift Card --" value="" color={isDark ? '#f9fafb' : '#111827'} />
                 {giftcards.map((card) => (
-                  <Picker.Item key={card.id} label={card.giftcard_name} value={card.id} color={isDark ? '#f9fafb' : '#111827'} />
+                  <Picker.Item key={card.id} label={card.giftcard_name} value={String(card.id)} color={isDark ? '#f9fafb' : '#111827'} />
                 ))}
               </Picker>
             </View>
@@ -147,7 +148,7 @@ export default function ExchangeGiftCardScreen({ navigation }: any) {
           {/* Exchange Rate */}
           <View style={styles.formGroup}>
             <Text style={[styles.label, isDark && styles.labelDark]}>Exchange Rate</Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, isDark && styles.inputWrapperDark]}>
               <Ionicons name="swap-horizontal-outline" size={20} color="#9ca3af" style={styles.inputIcon} />
               <TextInput
                 style={[styles.inputDisabled, isDark && styles.inputDisabledDark]}
@@ -160,7 +161,7 @@ export default function ExchangeGiftCardScreen({ navigation }: any) {
           {/* Card Value */}
           <View style={styles.formGroup}>
             <Text style={[styles.label, isDark && styles.labelDark]}>Card Value (USD)</Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, isDark && styles.inputWrapperDark]}>
               <Ionicons name="card-outline" size={20} color="#9ca3af" style={styles.inputIcon} />
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
@@ -176,7 +177,7 @@ export default function ExchangeGiftCardScreen({ navigation }: any) {
           {/* Naira Value */}
           <View style={styles.formGroup}>
             <Text style={[styles.label, isDark && styles.labelDark]}>Naira Value (₦)</Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, isDark && styles.inputWrapperDark]}>
               <Ionicons name="cash-outline" size={20} color="#9ca3af" style={styles.inputIcon} />
               <TextInput
                 style={[styles.inputDisabled, isDark && styles.inputDisabledDark]}
@@ -189,7 +190,7 @@ export default function ExchangeGiftCardScreen({ navigation }: any) {
           {/* Bank Name */}
           <View style={styles.formGroup}>
             <Text style={[styles.label, isDark && styles.labelDark]}>Bank Name</Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, isDark && styles.inputWrapperDark]}>
               <Ionicons name="business-outline" size={20} color="#9ca3af" style={styles.inputIcon} />
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
@@ -204,7 +205,7 @@ export default function ExchangeGiftCardScreen({ navigation }: any) {
           {/* Account Name */}
           <View style={styles.formGroup}>
             <Text style={[styles.label, isDark && styles.labelDark]}>Account Name</Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, isDark && styles.inputWrapperDark]}>
               <Ionicons name="person-outline" size={20} color="#9ca3af" style={styles.inputIcon} />
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
@@ -219,7 +220,7 @@ export default function ExchangeGiftCardScreen({ navigation }: any) {
           {/* Account Number */}
           <View style={styles.formGroup}>
             <Text style={[styles.label, isDark && styles.labelDark]}>Account Number</Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, isDark && styles.inputWrapperDark]}>
               <Ionicons name="keypad-outline" size={20} color="#9ca3af" style={styles.inputIcon} />
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
@@ -342,6 +343,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#d1d5db',
     paddingHorizontal: spacing.sm,
+  },
+  inputWrapperDark: {
+    backgroundColor: '#374151',
+    borderColor: '#4b5563',
   },
   inputIcon: {
     marginRight: spacing.xs,

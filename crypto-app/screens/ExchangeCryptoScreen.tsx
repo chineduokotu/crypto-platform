@@ -118,7 +118,8 @@ export default function ExchangeCryptoScreen({ navigation }: any) {
               <Picker
                 selectedValue={selectedWallet?.id}
                 onValueChange={(val) => {
-                  setSelectedWallet(wallets.find((w) => w.id === val) || null);
+                  // Compare as strings to be safe
+                  setSelectedWallet(wallets.find((w) => String(w.id) === String(val)) || null);
                 }}
                 style={[styles.picker, isDark && styles.pickerDark]}
                 dropdownIconColor={isDark ? '#f9fafb' : '#111827'}
@@ -152,7 +153,7 @@ export default function ExchangeCryptoScreen({ navigation }: any) {
           {/* Crypto Amount */}
           <View style={styles.formGroup}>
             <Text style={[styles.label, isDark && styles.labelDark]}>Crypto Amount</Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, isDark && styles.inputWrapperDark]}>
               <Ionicons name="logo-bitcoin" size={20} color="#9ca3af" style={styles.inputIcon} />
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
@@ -168,7 +169,7 @@ export default function ExchangeCryptoScreen({ navigation }: any) {
           {/* Naira Value */}
           <View style={styles.formGroup}>
             <Text style={[styles.label, isDark && styles.labelDark]}>Naira Value (₦)</Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, isDark && styles.inputWrapperDark]}>
               <Ionicons name="cash-outline" size={20} color="#9ca3af" style={styles.inputIcon} />
               <TextInput
                 style={[styles.inputDisabled, isDark && styles.inputDisabledDark]}
@@ -181,7 +182,7 @@ export default function ExchangeCryptoScreen({ navigation }: any) {
           {/* Bank Name */}
           <View style={styles.formGroup}>
             <Text style={[styles.label, isDark && styles.labelDark]}>Bank Name</Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, isDark && styles.inputWrapperDark]}>
               <Ionicons name="business-outline" size={20} color="#9ca3af" style={styles.inputIcon} />
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
@@ -196,7 +197,7 @@ export default function ExchangeCryptoScreen({ navigation }: any) {
           {/* Account Name */}
           <View style={styles.formGroup}>
             <Text style={[styles.label, isDark && styles.labelDark]}>Account Name</Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, isDark && styles.inputWrapperDark]}>
               <Ionicons name="person-outline" size={20} color="#9ca3af" style={styles.inputIcon} />
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
@@ -211,7 +212,7 @@ export default function ExchangeCryptoScreen({ navigation }: any) {
           {/* Account Number */}
           <View style={styles.formGroup}>
             <Text style={[styles.label, isDark && styles.labelDark]}>Account Number</Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, isDark && styles.inputWrapperDark]}>
               <Ionicons name="card-outline" size={20} color="#9ca3af" style={styles.inputIcon} />
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
@@ -357,6 +358,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#d1d5db',
     paddingHorizontal: spacing.sm,
+  },
+  inputWrapperDark: {
+    backgroundColor: '#374151',
+    borderColor: '#4b5563',
   },
   inputIcon: {
     marginRight: spacing.xs,

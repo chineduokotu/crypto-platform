@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Switch } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Switch, TextInput } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
+import apiClient from '../utils/api';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius } from '../constants/theme';
 import { authStorage } from '../utils/storage';
@@ -7,6 +9,8 @@ import { useTheme } from '../contexts/ThemeContext';
 
 export default function ProfileScreen({ navigation }: any) {
   const [fullName, setFullName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [referralLink, setReferralLink] = useState('Loading...');
   const { isDark, toggleTheme } = useTheme();
 
   useEffect(() => {
@@ -16,6 +20,18 @@ export default function ProfileScreen({ navigation }: any) {
   const loadUserData = async () => {
     const userData = await authStorage.getUserData();
     setFullName(userData.fullName || 'User');
+
+    if (userData.userId) {
+      try {
+        const res = await apiClient.post('/get_user_email.php', { userId: userData.userId });
+        if (res.data?.success) {
+          setUserEmail(res.data.email);
+          setReferralLink(`http://192.168.0.135:8080/register?ref=${res.data.email}`);
+        }
+      } catch (err) {
+        console.error('Failed to load email:', err);
+      }
+    }
   };
 
   const getInitials = (name: string) => {
@@ -43,6 +59,11 @@ export default function ProfileScreen({ navigation }: any) {
         },
       ]
     );
+  };
+
+  const copyReferral = async () => {
+    await Clipboard.setStringAsync(referralLink);
+    Alert.alert('Success', 'Referral link copied to clipboard!');
   };
 
   const accountItems = [
@@ -104,6 +125,31 @@ export default function ProfileScreen({ navigation }: any) {
                   />
                 </TouchableOpacity>
               ))}
+            </View>
+          </View>
+
+          {/* Refer & Earn Section */}
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, isDark && styles.textDark]}>Refer & Earn</Text>
+            <View style={[styles.card, isDark && styles.cardDark, { padding: 16 }]}>
+              <Text style={[styles.label, isDark && styles.textDark]}>Your Referral Link:</Text>
+              <View style={[styles.referralContainer, isDark && styles.referralContainerDark]}>
+                <TextInput
+                  style={[styles.referralInput, isDark && styles.textDark]}
+                  value={referralLink}
+                  editable={false}
+                />
+                <TouchableOpacity
+                  style={styles.copyButton}
+                  onPress={copyReferral}
+                  disabled={!userEmail}
+                >
+                  <Text style={styles.copyButtonText}>Copy</Text>
+                </TouchableOpacity>
+              </View>
+              <Text style={styles.helperText}>
+                Share this link — users who register using it become your referrals.
+              </Text>
             </View>
           </View>
 
@@ -342,5 +388,43 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 8,
+    color: '#374151',
+  },
+  referralContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f3f4f6',
+    borderRadius: 8,
+    padding: 4,
+  },
+  referralContainerDark: {
+    backgroundColor: '#374151',
+  },
+  referralInput: {
+    flex: 1,
+    paddingHorizontal: 8,
+    fontSize: 13,
+    color: '#374151',
+  },
+  copyButton: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  copyButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  helperText: {
+    fontSize: 11,
+    color: '#9ca3af',
+    marginTop: 8,
   },
 });

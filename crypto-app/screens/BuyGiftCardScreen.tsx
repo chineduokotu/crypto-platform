@@ -69,7 +69,8 @@ export default function BuyGiftCardScreen({ navigation }: any) {
       return;
     }
 
-    const card = giftcards.find((g) => g.id === parseInt(String(giftcardId)));
+    // Compare as strings to handle both number and string IDs
+    const card = giftcards.find((g) => String(g.id) === String(giftcardId));
     if (card) {
       setSelectedGiftcard(card);
       setExchangeRate(card.exchange_rate);
@@ -159,7 +160,7 @@ export default function BuyGiftCardScreen({ navigation }: any) {
           {/* Card Value */}
           <View style={styles.formGroup}>
             <Text style={[styles.label, isDark && styles.labelDark]}>Card Value (USD)</Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, isDark && styles.inputWrapperDark]}>
               <Ionicons name="card-outline" size={20} color="#9ca3af" style={styles.inputIcon} />
               <TextInput
                 style={[styles.input, isDark && styles.inputDark]}
@@ -175,7 +176,7 @@ export default function BuyGiftCardScreen({ navigation }: any) {
           {/* Total Cost (Naira) */}
           <View style={styles.formGroup}>
             <Text style={[styles.label, isDark && styles.labelDark]}>Total Cost (NGN)</Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, isDark && styles.inputWrapperDark]}>
               <Ionicons name="cash-outline" size={20} color="#9ca3af" style={styles.inputIcon} />
               <TextInput
                 style={[styles.inputDisabled, isDark && styles.inputDisabledDark]}
@@ -304,6 +305,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#d1d5db',
     paddingHorizontal: spacing.sm,
+  },
+  inputWrapperDark: {
+    backgroundColor: '#374151',
+    borderColor: '#4b5563',
   },
   inputIcon: {
     marginRight: spacing.xs,

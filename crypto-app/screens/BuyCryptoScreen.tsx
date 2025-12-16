@@ -15,8 +15,10 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import { colors, spacing, borderRadius } from '../constants/theme';
 import apiClient from '../utils/api';
 import { authStorage } from '../utils/storage';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface WalletType {
   id: number;
@@ -43,6 +45,7 @@ const BuyCrypto: React.FC = () => {
   const [paymentProof, setPaymentProof] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const { isDark } = useTheme();
 
   // Fetch wallets
   useEffect(() => {
@@ -170,44 +173,48 @@ const BuyCrypto: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isDark && styles.containerDark]}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color="#1f2937" />
+        <View style={[styles.header, isDark && styles.headerDark]}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color={isDark ? '#f9fafb' : '#111827'} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Buy Cryptocurrency</Text>
+          <Text style={[styles.headerTitle, isDark && styles.textDark]}>Buy Cryptocurrency</Text>
           <View style={{ width: 24 }} />
         </View>
 
         {/* Card Content */}
-        <View style={styles.card}>
+        <View style={[styles.card, isDark && styles.cardDark]}>
           {/* Wallet Select */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Select Wallet</Text>
-            <View style={styles.pickerContainer}>
+            <Text style={[styles.label, isDark && styles.textDark]}>Select Wallet</Text>
+            <View style={[styles.pickerContainer, isDark && styles.pickerContainerDark]}>
               <Picker
                 selectedValue={selectedWallet ? String(selectedWallet.id) : ""}
                 onValueChange={(value) => {
+                  if (value === "") {
+                    setSelectedWallet(null);
+                    return;
+                  }
                   const selectedId = Number(value);
                   const wallet = wallets.find((w) => w.id === selectedId) ?? null;
                   setSelectedWallet(wallet);
                 }}
-                style={styles.picker}
-                dropdownIconColor="#111827"
+                style={[styles.picker, isDark && styles.pickerDark]}
+                dropdownIconColor={isDark ? '#f9fafb' : '#111827'}
               >
-                <Picker.Item label="-- Choose Wallet --" value="" color="#111827" />
+                <Picker.Item label="-- Choose Wallet --" value="" color={isDark ? '#f9fafb' : '#111827'} />
                 {wallets.map((wallet) => (
                   <Picker.Item
                     key={wallet.id}
                     label={wallet.wallet_name}
-                    value={wallet.id}
-                    color="#111827"
+                    value={String(wallet.id)}
+                    color={isDark ? '#f9fafb' : '#111827'}
                   />
                 ))}
               </Picker>
@@ -216,26 +223,27 @@ const BuyCrypto: React.FC = () => {
 
           {/* Account Details Section */}
           {selectedWallet && selectedAccount && (
-            <View style={styles.accountDetails}>
-              <Text style={styles.accountTitle}>🏦 Pay to this Bank Account:</Text>
-              <Text style={styles.accountText}>
-                <Text style={styles.bold}>Bank:</Text> {selectedAccount.bank_name}
+            <View style={[styles.accountDetails, isDark && styles.accountDetailsDark]}>
+              <Text style={[styles.accountTitle, isDark && styles.textDark]}>🏦 Pay to this Bank Account:</Text>
+              <Text style={[styles.accountText, isDark && styles.textSecondaryDark]}>
+                <Text style={[styles.bold, isDark && styles.textDark]}>Bank:</Text> {selectedAccount.bank_name}
               </Text>
-              <Text style={styles.accountText}>
-                <Text style={styles.bold}>Account Name:</Text> {selectedAccount.account_name}
+              <Text style={[styles.accountText, isDark && styles.textSecondaryDark]}>
+                <Text style={[styles.bold, isDark && styles.textDark]}>Account Name:</Text> {selectedAccount.account_name}
               </Text>
-              <Text style={styles.accountText}>
-                <Text style={styles.bold}>Account Number:</Text> {selectedAccount.account_number}
+              <Text style={[styles.accountText, isDark && styles.textSecondaryDark]}>
+                <Text style={[styles.bold, isDark && styles.textDark]}>Account Number:</Text> {selectedAccount.account_number}
               </Text>
             </View>
           )}
 
           {/* Amount */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Amount (₦)</Text>
+            <Text style={[styles.label, isDark && styles.textDark]}>Amount (₦)</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, isDark && styles.inputDark]}
               placeholder="Enter amount"
+              placeholderTextColor={isDark ? '#9ca3af' : '#6b7280'}
               keyboardType="numeric"
               value={amount}
               onChangeText={setAmount}
@@ -245,9 +253,9 @@ const BuyCrypto: React.FC = () => {
           {/* Crypto Equivalent */}
           {selectedWallet && (
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Crypto Equivalent</Text>
+              <Text style={[styles.label, isDark && styles.textDark]}>Crypto Equivalent</Text>
               <TextInput
-                style={[styles.input, styles.disabledInput]}
+                style={[styles.input, styles.disabledInput, isDark && styles.disabledInputDark]}
                 value={`${cryptoValue} ${selectedWallet.wallet_name}`}
                 editable={false}
               />
@@ -256,10 +264,10 @@ const BuyCrypto: React.FC = () => {
 
           {/* Upload Proof */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Upload Payment Proof</Text>
-            <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
-              <Ionicons name="cloud-upload-outline" size={20} color="#2563eb" />
-              <Text style={styles.uploadButtonText}>
+            <Text style={[styles.label, isDark && styles.textDark]}>Upload Payment Proof</Text>
+            <TouchableOpacity style={[styles.uploadButton, isDark && styles.uploadButtonDark]} onPress={pickImage}>
+              <Ionicons name={paymentProof ? "checkmark-circle" : "cloud-upload-outline"} size={20} color={isDark ? '#60a5fa' : '#2563eb'} />
+              <Text style={[styles.uploadButtonText, isDark && styles.uploadTextDark]}>
                 {paymentProof ? "Image Selected ✓" : "Choose Image"}
               </Text>
             </TouchableOpacity>
@@ -286,10 +294,10 @@ const BuyCrypto: React.FC = () => {
       {/* Success Modal */}
       <Modal visible={showSuccess} transparent animationType="fade">
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, isDark && styles.modalContentDark]}>
             <Ionicons name="checkmark-circle" size={80} color="#10b981" />
-            <Text style={styles.modalTitle}>Success!</Text>
-            <Text style={styles.modalText}>
+            <Text style={[styles.modalTitle, isDark && styles.textDark]}>Success!</Text>
+            <Text style={[styles.modalText, isDark && styles.textDark]}>
               Your crypto purchase request was submitted successfully.
             </Text>
           </View>
@@ -297,20 +305,18 @@ const BuyCrypto: React.FC = () => {
       </Modal>
 
       {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
+      <View style={[styles.bottomNav, isDark && styles.bottomNavDark]}>
         <TouchableOpacity
           style={styles.navItem}
           onPress={() => navigation.navigate("Dashboard" as never)}
         >
-          <View style={styles.navIconActive}>
-            <Ionicons name="home" size={20} color="#fff" />
-          </View>
+          <Ionicons name="home-outline" size={24} color={isDark ? '#9ca3af' : '#6b7280'} />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navItem}
           onPress={() => navigation.navigate("AddMoney" as never)}
         >
-          <Ionicons name="wallet-outline" size={24} color="#9ca3af" />
+          <Ionicons name="wallet-outline" size={24} color={isDark ? '#9ca3af' : '#6b7280'} />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navItem}
@@ -322,7 +328,7 @@ const BuyCrypto: React.FC = () => {
           style={styles.navItem}
           onPress={() => navigation.navigate("Profile" as never)}
         >
-          <Ionicons name="person-outline" size={24} color="#9ca3af" />
+          <Ionicons name="person-outline" size={24} color={isDark ? '#9ca3af' : '#6b7280'} />
         </TouchableOpacity>
       </View>
     </View>
@@ -332,13 +338,16 @@ const BuyCrypto: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f9fafb",
+    backgroundColor: "#f3f4f6",
+  },
+  containerDark: {
+    backgroundColor: "#111827",
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.lg,
     paddingTop: Platform.OS === "ios" ? 50 : 20,
     paddingBottom: 100,
   },
@@ -346,73 +355,111 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 20,
+    marginBottom: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
+  headerDark: {
+    backgroundColor: 'rgba(31, 41, 55, 0.)', // Using transparent or matching background
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "600",
-    color: "#1f2937",
+    color: "#111827",
+  },
+  backButton: {
+    padding: 4,
+  },
+  textDark: {
+    color: "#f9fafb",
+  },
+  textSecondaryDark: {
+    color: "#d1d5db",
   },
   card: {
     backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: borderRadius.xl,
+    padding: spacing.xl,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
   },
+  cardDark: {
+    backgroundColor: "#1f2937",
+  },
   inputGroup: {
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   label: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "500",
     color: "#374151",
-    marginBottom: 8,
+    marginBottom: spacing.xs,
   },
   pickerContainer: {
     backgroundColor: "#fff",
     borderWidth: 1,
     borderColor: "#d1d5db",
-    borderRadius: 8,
+    borderRadius: borderRadius.md,
     overflow: "hidden",
   },
+  pickerContainerDark: {
+    backgroundColor: "#374151",
+    borderColor: "#4b5563",
+  },
   picker: {
-    height: 50,
     color: "#111827",
   },
+  pickerDark: {
+    color: "#f9fafb",
+  },
   input: {
+    backgroundColor: "#fff",
     borderWidth: 1,
     borderColor: "#d1d5db",
-    borderRadius: 8,
-    padding: 12,
+    borderRadius: borderRadius.md,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     fontSize: 16,
     color: "#1f2937",
+  },
+  inputDark: {
+    backgroundColor: "#374151",
+    borderColor: "#4b5563",
+    color: "#f9fafb",
   },
   disabledInput: {
     backgroundColor: "#f3f4f6",
     color: "#6b7280",
   },
+  disabledInputDark: {
+    backgroundColor: '#4b5563',
+    color: '#d1d5db',
+    borderColor: '#4b5563',
+  },
   accountDetails: {
     backgroundColor: "#f9fafb",
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 20,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
     borderWidth: 1,
     borderColor: "#e5e7eb",
+  },
+  accountDetailsDark: {
+    backgroundColor: 'rgba(55, 65, 81, 0.5)',
+    borderColor: '#4b5563',
   },
   accountTitle: {
     fontSize: 16,
     fontWeight: "600",
     color: "#1f2937",
-    marginBottom: 12,
+    marginBottom: 8,
   },
   accountText: {
     fontSize: 14,
     color: "#4b5563",
-    marginBottom: 6,
+    marginBottom: 4,
   },
   bold: {
     fontWeight: "600",
@@ -423,16 +470,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "#2563eb",
-    borderRadius: 8,
-    padding: 12,
-    backgroundColor: "#eff6ff",
+    borderColor: "#d1d5db",
+    borderRadius: borderRadius.md,
+    padding: 16,
+    borderStyle: 'dashed',
+    backgroundColor: "#f9fafb",
+  },
+  uploadButtonDark: {
+    backgroundColor: 'rgba(55, 65, 81, 0.5)',
+    borderColor: '#4b5563',
   },
   uploadButtonText: {
-    color: "#2563eb",
-    fontSize: 16,
+    color: "#6b7280",
+    fontSize: 14,
     fontWeight: "500",
     marginLeft: 8,
+  },
+  uploadTextDark: {
+    color: '#d1d5db',
   },
   fileName: {
     fontSize: 12,
@@ -440,14 +495,14 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   submitButton: {
-    backgroundColor: "#2563eb",
-    borderRadius: 8,
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.xl,
     padding: 16,
     alignItems: "center",
-    marginTop: 10,
+    marginTop: spacing.sm,
   },
   submitButtonDisabled: {
-    backgroundColor: "#93c5fd",
+    opacity: 0.7,
   },
   submitButtonText: {
     color: "#fff",
@@ -462,10 +517,13 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 40,
+    borderRadius: borderRadius.xl,
+    padding: spacing.xl,
     alignItems: "center",
     maxWidth: 300,
+  },
+  modalContentDark: {
+    backgroundColor: "#1f2937",
   },
   modalTitle: {
     fontSize: 24,
@@ -480,28 +538,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   bottomNav: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    paddingVertical: 12,
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    paddingVertical: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: "#e5e7eb",
+    borderTopColor: 'rgba(229, 231, 235, 0.5)',
+  },
+  bottomNavDark: {
+    backgroundColor: 'rgba(31, 41, 55, 0.9)',
+    borderTopColor: 'rgba(75, 85, 99, 0.5)',
   },
   navItem: {
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 8,
-  },
-  navIconActive: {
-    width: 40,
-    height: 40,
-    backgroundColor: "#2563eb",
-    borderRadius: 20,
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
   },
